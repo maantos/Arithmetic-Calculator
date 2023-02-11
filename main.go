@@ -7,11 +7,16 @@ import (
 func main() {
 
 	p := Parser{}
-	expression := "-10"
-	result, err := p.Parse(expression)
+	expression := "(4+5*(7-3))-2"
+	root, err := p.Parse(expression)
 
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fmt.Printf("\nEquation = %d\n", result)
+
+	fmt.Println(root.print())
+
+	fmt.Println(Evaluate(root))
+
+	// fmt.Printf("\nEquation = %d\n", result)
 }
