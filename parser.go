@@ -12,6 +12,7 @@ type Parser struct {
 	index      int
 }
 
+// Grammar for expresion E -> T {+|- T}
 func (p *Parser) parseE() (int, error) {
 	a, err := p.parseT()
 	if err != nil {
@@ -38,6 +39,7 @@ func (p *Parser) parseE() (int, error) {
 	}
 }
 
+// Grammar for Term  T -> F {*|/ F}
 func (p *Parser) parseT() (int, error) {
 	a, err := p.parseF()
 	if err != nil {
@@ -68,6 +70,7 @@ func (p *Parser) parseT() (int, error) {
 	}
 }
 
+// Grammar for Factor  F -> (E) | Digit
 func (p *Parser) parseF() (int, error) {
 
 	if unicode.IsNumber(rune(p.Token)) {
