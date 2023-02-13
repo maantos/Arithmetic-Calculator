@@ -2,8 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
-	"strconv"
 )
 
 type Operation int
@@ -74,24 +72,24 @@ func Evaluate(node *ASTNode) (int, error) {
 	return result, nil
 }
 
-func printTree(node *ASTNode) string {
+// func printTree(node *ASTNode) string {
 
-	if node == nil {
-		return ""
-	}
+// 	if node == nil {
+// 		return ""
+// 	}
 
-	var operation rune
-	switch node.Operation {
-	case Digit:
-		return strconv.Itoa(node.Value)
-	case Plus:
-		operation = '+'
-	case Minus:
-		operation = '-'
-	case Mult:
-		operation = '*'
-	case Div:
-		operation = '/'
-	}
-	return fmt.Sprintf("(" + printTree(node.Left) + string(operation) + printTree(node.Right) + ")")
-}
+// 	var operation rune
+// 	switch node.Operation {
+// 	case Digit:
+// 		return strconv.Itoa(node.Value)
+// 	case Plus:
+// 		operation = '+'
+// 	case Minus:
+// 		operation = '-'
+// 	case Mult:
+// 		operation = '*'
+// 	case Div:
+// 		operation = '/'
+// 	}
+// 	return fmt.Sprintf("(" + printTree(node.Left) + string(operation) + printTree(node.Right) + ")")
+// }
