@@ -2,137 +2,136 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"unicode"
 )
 
 type Parser struct {
-	Token      byte
+	token      byte
 	expression string
 	index      int
 }
 
 // Grammar for expresion E -> T {+|- T}
-func (p *Parser) parseE() *ASTNode {
-	termNode := p.parseT()
-	if termNode == nil {
-		fmt.Println(errors.New("error while parsing term"))
-		return nil
+func (p *Parser) parseE() (*ASTNode, error) {
+	termNode, err := p.parseT()
+
+	if err != nil {
+		return nil, err
 	}
 	for {
-		if p.Token == '+' {
-			p.GetNextToken('+')
-			term2Node := p.parseT()
+		if p.token == '+' {
+			p.GetNextToken()
+			term2Node, err := p.parseT()
 
-			if term2Node == nil {
-				fmt.Println(errors.New("error while parsing term"))
-				return nil
+			if err != nil {
+				return nil, err
 			}
 
-			termNode = NewNode("Plus", termNode, term2Node)
-		} else if p.Token == '-' {
-			p.GetNextToken('-')
-			term2Node := p.parseT()
+			termNode = NewNode(Plus, termNode, term2Node)
+		} else if p.token == '-' {
+			p.GetNextToken()
+			term2Node, err := p.parseT()
 
-			if term2Node == nil {
-				fmt.Println(errors.New("error while parsing term"))
-				return nil
+			if err != nil {
+				return nil, err
 			}
-			termNode = NewNode("Minus", termNode, term2Node)
+			termNode = NewNode(Minus, termNode, term2Node)
 		} else {
-			return termNode
+			return termNode, nil
 		}
 	}
 }
 
 // Grammar for Term  T -> F {*|/ F}
-func (p *Parser) parseT() *ASTNode {
+func (p *Parser) parseT() (*ASTNode, error) {
 
-	fNode := p.parseF()
+	fNode, err := p.parseF()
 
-	if fNode == nil {
-		fmt.Println(errors.New("error while parsing factor"))
-		return nil
+	if err != nil {
+		return nil, err
 	}
 	for {
-		if p.Token == '*' {
-			p.GetNextToken('*')
-			f2Node := p.parseF()
-			if f2Node == nil {
-				fmt.Println(errors.New("error while parsing factor"))
-				return nil
+		if p.token == '*' {
+			p.GetNextToken()
+			f2Node, err := p.parseF()
+			if err != nil {
+				return nil, err
 			}
-			fNode = NewNode("Mult", fNode, f2Node)
+			fNode = NewNode(Mult, fNode, f2Node)
 
-		} else if p.Token == '/' {
-			p.GetNextToken('/')
-			f2Node := p.parseF()
-			if f2Node == nil {
-				fmt.Println(errors.New("error while parsing factor"))
-				return nil
+		} else if p.token == '/' {
+			p.GetNextToken()
+			f2Node, err := p.parseF()
+			if err != nil {
+				return nil, err
 			}
-			fNode = NewNode("Div", fNode, f2Node)
+			fNode = NewNode(Div, fNode, f2Node)
 		} else {
-			return fNode
+			return fNode, nil
 		}
 	}
 }
 
 // Grammar for Factor  F -> (E) | Digit
-func (p *Parser) parseF() *ASTNode {
+func (p *Parser) parseF() (*ASTNode, error) {
 
-	if unicode.IsNumber(rune(p.Token)) {
-		x, _ := strconv.Atoi(string(p.Token))
-		p.GetNextToken(p.Token)
-		node := NewNode("Digit", nil, nil)
+	if unicode.IsNumber(rune(p.token)) {
+		x, err := strconv.Atoi(string(p.token))
+		if err != nil {
+			return nil, errors.New("error while converting digit to int")
+		}
+		p.GetNextToken()
+		node := NewNode(Digit, nil, nil)
 		node.Value = x
-		return node
+		return node, nil
 
-	} else if p.Token == '(' {
-		p.GetNextToken('(')
-		node := p.parseE()
+	} else if p.token == '(' {
+		p.GetNextToken()
+		node, err := p.parseE()
 
-		if node == nil {
-			fmt.Println(errors.New("error while parsing expression"))
-			return nil
+		if err != nil {
+			return nil, errors.New("error while parsing expression")
 		}
 
-		if p.Token == ')' {
-			p.GetNextToken(')')
-			return node
+		if p.token == ')' {
+			p.GetNextToken()
+			return node, nil
 		} else {
-			fmt.Println(errors.New("closing bracket is missing"))
-			return nil
+			return nil, errors.New("closing bracket is missing")
 		}
 	}
-	fmt.Println(errors.New("unexpected symbol"))
-	return nil
+	return nil, errors.New("unexpected symbol")
 }
 
-func (p *Parser) GetNextToken(expected byte) {
+func (p *Parser) GetNextToken() {
 	if p.index < len(p.expression)-1 {
 		p.index++
-		p.Token = p.expression[p.index]
+		p.token = p.expression[p.index]
 	} else {
-		p.Token = '\n'
+		p.token = '\n'
 	}
 }
 
-func (p *Parser) Parse(expression string) (*ASTNode, error) {
-	p.index = 0
-	p.expression = expression
-	p.Token = p.expression[p.index]
+func (p *Parser) Parse() (*ASTNode, error) {
 
-	root := p.parseE()
+	p.GetNextToken()
+	root, err := p.parseE()
 
-	// if err != nil {
-	// 	return -1, err
-	// }
+	if err != nil {
+		return nil, err
+	}
 
-	if p.Token != '\n' {
-		return nil, errors.New("error while Parsing")
+	if p.token != '\n' {
+		return nil, errors.New("didnt consume all tokens while parsing")
 	}
 
 	return root, nil
+}
+
+func NewParser(expression string) *Parser {
+	return &Parser{
+		expression: expression,
+		index:      -1,
+	}
 }
