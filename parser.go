@@ -15,8 +15,8 @@ type Parser struct {
 // Grammar for expresion E -> T {+|- T}
 func (p *Parser) parseE() (*ASTNode, error) {
 	termNode, err := p.parseT()
+
 	if err != nil {
-		//fmt.Println(errors.New("error while parsing term"))
 		return nil, err
 	}
 	for {
@@ -25,7 +25,6 @@ func (p *Parser) parseE() (*ASTNode, error) {
 			term2Node, err := p.parseT()
 
 			if err != nil {
-				//fmt.Println(errors.New("error while parsing term"))
 				return nil, err
 			}
 
@@ -50,7 +49,6 @@ func (p *Parser) parseT() (*ASTNode, error) {
 	fNode, err := p.parseF()
 
 	if err != nil {
-		//fmt.Println(errors.New("error while parsing factor"))
 		return nil, err
 	}
 	for {
@@ -58,7 +56,6 @@ func (p *Parser) parseT() (*ASTNode, error) {
 			p.GetNextToken()
 			f2Node, err := p.parseF()
 			if err != nil {
-				//fmt.Println(errors.New("error while parsing factor"))
 				return nil, err
 			}
 			fNode = NewNode(Mult, fNode, f2Node)
@@ -67,7 +64,6 @@ func (p *Parser) parseT() (*ASTNode, error) {
 			p.GetNextToken()
 			f2Node, err := p.parseF()
 			if err != nil {
-				//fmt.Println(errors.New("error while parsing factor"))
 				return nil, err
 			}
 			fNode = NewNode(Div, fNode, f2Node)
@@ -83,7 +79,6 @@ func (p *Parser) parseF() (*ASTNode, error) {
 	if unicode.IsNumber(rune(p.token)) {
 		x, err := strconv.Atoi(string(p.token))
 		if err != nil {
-			//fmt.Errorf("error while converting digit to int: %v", err)
 			return nil, errors.New("error while converting digit to int")
 		}
 		p.GetNextToken()
@@ -106,7 +101,7 @@ func (p *Parser) parseF() (*ASTNode, error) {
 			return nil, errors.New("closing bracket is missing")
 		}
 	}
-	return nil, errors.New("unexpected or missing symbol")
+	return nil, errors.New("unexpected symbol")
 }
 
 func (p *Parser) GetNextToken() {
@@ -124,7 +119,7 @@ func (p *Parser) Parse() (*ASTNode, error) {
 	root, err := p.parseE()
 
 	if err != nil {
-		return nil, err //errors.New("error parsing expression")
+		return nil, err
 	}
 
 	if p.token != '\n' {

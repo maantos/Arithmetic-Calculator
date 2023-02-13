@@ -34,6 +34,10 @@ func NewNode(operation Operation, left, right *ASTNode) *ASTNode {
 
 func Evaluate(node *ASTNode) (int, error) {
 
+	if node == nil {
+		return 0, errors.New("node doesnt exist")
+	}
+
 	if node.Operation == Digit {
 		return node.Value, nil
 	}
@@ -70,12 +74,16 @@ func Evaluate(node *ASTNode) (int, error) {
 	return result, nil
 }
 
-func (a *ASTNode) print() string {
+func printTree(node *ASTNode) string {
+
+	if node == nil {
+		return ""
+	}
 
 	var operation rune
-	switch a.Operation {
+	switch node.Operation {
 	case Digit:
-		return strconv.Itoa(a.Value)
+		return strconv.Itoa(node.Value)
 	case Plus:
 		operation = '+'
 	case Minus:
@@ -85,5 +93,5 @@ func (a *ASTNode) print() string {
 	case Div:
 		operation = '/'
 	}
-	return fmt.Sprintf("(" + a.Left.print() + string(operation) + a.Right.print() + ")")
+	return fmt.Sprintf("(" + printTree(node.Left) + string(operation) + printTree(node.Right) + ")")
 }

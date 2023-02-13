@@ -18,7 +18,7 @@ type ErrorResult struct {
 }
 
 func main() {
-	file, err := os.Open("../expressions.txt")
+	file, err := os.Open("expressions.txt")
 	if err != nil {
 		log.Fatalf("failed to open file: %v", err)
 	}
@@ -54,11 +54,11 @@ func main() {
 	for i := 0; i < counter; i++ {
 		select {
 		case result := <-results:
-			fmt.Printf("equation: %s with value %d\n", result.expression, result.value)
-			//fmt.Printf("equation=%d",result.value)
+			//fmt.Printf("equation: %s with value %d\n", result.expression, result.value)
+			fmt.Printf("equation=%d", result.value)
 		case err := <-errors:
-			fmt.Printf("equation: %s with Error: %s\n", err.expression, err.err)
-			//fmt.Println(err)
+			//fmt.Printf("equation: %s with Error: %s\n", err.expression, err.err)
+			fmt.Println(err)
 		}
 	}
 }
